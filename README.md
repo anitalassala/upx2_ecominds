@@ -3,6 +3,6 @@
 ---
 ### Desenvolvimento Sustentável
 
-## Projeto a ser Desenvolvido
+## 💡 Projeto a ser Desenvolvido
 
 > ✏️Introdução do Projeto
