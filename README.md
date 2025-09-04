@@ -1,8 +1,8 @@
-# 📚 UPX 2 
+# 📚 UPX 2 💻
 ## Equipe: EcoMinds 🍃
 ---
 ### Desenvolvimento Sustentável
 
 ## Projeto a ser Desenvolvido
 
-> Introdução do Projeto
+> ✏️Introdução do Projeto
