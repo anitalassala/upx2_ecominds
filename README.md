@@ -41,13 +41,17 @@
 - Entidades completas para usuário, papéis e unidades
 
 ✅ Estrutura do Projeto
-- `controllers/` – Controladores REST
-- `services/` – Lógica de negócios
-- `repositorys/` – Interfaces JPA
-- `model/` – Entidades
-- `dto/` – Objetos de transferência de dados
-- `config/` – Configurações de segurança
-- `static/` e `templates/` – Recursos de interface
-
-O projeto inclui um arquivo docker-compose para facilitar a execução do ambiente.
-O projeto inclui um arquivo docker-compose para facilitar a execução do ambiente.
+- `controllers/`
+  > Controladores REST
+- `services/`
+  > Lógica de negócios
+- `repositorys/`
+  > Interfaces JPA
+- `model/`
+  > Entidades
+- `dto/`
+  > Objetos de transferência de dados
+- `config/`
+  > Configurações de segurança
+- `static/` e `templates/`
+  > Recursos de interface
