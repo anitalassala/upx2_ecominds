@@ -1,8 +1,8 @@
 # 📚 UPX 2 💻
-## Equipe: EcoMinds 🍃
+## Equipe: ReConstrói 🍃
 ---
 ### 🌳 Desenvolvimento Sustentável ♻️
 
-## 💡 Projeto a ser Desenvolvido
+## 💡 SISTEMA DE GERENCIAMENTO DE RESÍDUOS NA GESTÃO DE OBRAS
 
-> ✏️Introdução do Projeto
+> ✏️ Introdução do Projeto
