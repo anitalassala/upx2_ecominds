@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Detalhes - ' + ${obra.nomeObra}">Detalhes da Obra</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="app-layout">
+
+<header th:replace="~{fragments/navbar :: navbar}"></header>
+
+<main class="container-app">
+
+    <a th:href="@{/dashboard}" class="back-link">&larr; Voltar para o Dashboard</a>
+
+    <div class="page-header">
+        <h1 th:text="${obra.nomeObra}">Nome da Obra</h1>
+        <p th:if="${obra.endereco}" th:text="${obra.endereco}">Endereço da Obra</p>
+    </div>
+
+    <section class="card">
+        <h2>Adicionar Material à Obra</h2>
+
+        <div th:if="${sucessoMaterial}" class="alert alert-success" th:text="${sucessoMaterial}"></div>
+        <div th:if="${erroMaterial}" class="alert alert-danger" th:text="${erroMaterial}"></div>
+
+        <form th:action="@{/obras/{id}/materiais/criar(id=${obra.id})}" th:object="${novoMaterialDto}" method="post">
+
+            <div class="form-group">
+                <label for="descricao">Descrição (Ex: Cimento, Tijolo):</label>
+                <input type="text" id="descricao" th:field="*{descricao}" required>
+                <div th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}" class="alert alert-danger" style="margin-top: 5px; padding: 5px;"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="quantidadeComprada">Quantidade Comprada:</label>
+                <input type="number" step="0.01" id="quantidadeComprada" th:field="*{quantidadeComprada}" required>
+                <div th:if="${#fields.hasErrors('quantidadeComprada')}" th:errors="*{quantidadeComprada}" class="alert alert-danger" style="margin-top: 5px; padding: 5px;"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="unidade">Unidade:</label>
+                <select id="unidade" th:field="*{unidade}" required>
+                    <option value="">Selecione</option>
+                    <option th:each="unidadeOpt : ${T(com.upx.RD.model.Unidade).values()}"
+                            th:value="${unidadeOpt}"
+                            th:text="${unidadeOpt.name()}"></option>
+                </select>
+                <div th:if="${#fields.hasErrors('unidade')}" th:errors="*{unidade}" class="alert alert-danger" style="margin-top: 5px; padding: 5px;"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="percentualDesperdicio">% de Desperdício (Lixo):</label>
+                <input type="number" step="0.1" id="percentualDesperdicio" th:field="*{percentualDesperdicio}">
+            </div>
+
+            <div class="form-group">
+                <label for="percentualSobra">% de Sobra (Vendável):</label>
+                <input type="number" step="0.1" id="percentualSobra" th:field="*{percentualSobra}">
+            </div>
+
+            <button type="submit" class="btn">Adicionar Material</button>
+        </form>
+    </section>
+
+
+
+    <section class="card" style="opacity: 0.7;">
+        <h2>Visão Geral dos Materiais</h2>
+        <p>Lista completa de tudo que foi comprado para esta obra.</p>
+
+        <div th:if="${#lists.isEmpty(materiais)}" class="alert alert-info">
+            Nenhum material cadastrado ainda.
+        </div>
+
+        <table class="materiais-table" th:unless="${#lists.isEmpty(materiais)}">
+            <thead>
+            <tr>
+                <th>Material</th>
+                <th>Qtd. Comprada</th>
+                <th>Custo (R$)</th>
+                <th>Desperdício (Lixo)</th>
+                <th class="col-calculado col-sobra">Sobra (Vendável)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="mat : ${materiais}">
+                <td th:text="${mat.descricao}">Cimento</td>
+                <td th:text="${#numbers.formatDecimal(mat.quantidadeComprada, 1, 2)} + ' ' + ${mat.unidade.name()}">100 KG</td>
+                <td th:text="'R$ ' + ${#numbers.formatDecimal(mat.preco, 1, 2)}">R$ 50,00</td>
+                <td class="col-calculado col-desperdicio"
+                    th:text="${#numbers.formatDecimal(mat.getQuantidadeDesperdicioCalculado(), 1, 2)} + ' ' + ${mat.unidade.name()}">30 KG</td>
+                <td class="col-calculado col-sobra"
+                    th:text="${#numbers.formatDecimal(mat.getQuantidadeSobraCalculada(), 1, 2)} + ' ' + ${mat.unidade.name()}">20 KG</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+
+    <form th:action="@{/posts/gerar-agrupado}" th:object="${postAgrupadoDto}" method="post">
+
+        <section class="card" style="background-color: #f8fcfd; border: 2px solid #eef6fc;">
+            <h2 style="color: #0056b3;">Gerar Post de Venda das Sobras</h2>
+            <p>Defina por quanto você quer VENDER cada sobra. Itens com preço R$ 0,00 não serão anunciados.</p>
+
+            <div th:if="${sucessoPostObra}" class="alert alert-success" th:text="${sucessoPostObra}"></div>
+            <div th:if="${erroPostObra}" class="alert alert-danger" th:text="${erroPostObra}"></div>
+
+            <div class="form-group">
+                <label for="tituloPost">Título do Post de Venda:</label>
+                <input type="text" id="tituloPost" th:field="*{tituloPost}" required class="form-control">
+            </div>
+
+            <table class="materiais-table">
+                <thead>
+                <tr>
+                    <th>Material (Sobra)</th>
+                    <th class="col-calculado col-sobra">Quantidade Disponível</th>
+                    <th style="width: 250px; background-color: #eef6fc;">Definir Preço de Venda (R$)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(postAgrupadoDto.itens)}">
+                    <td colspan="3" style="text-align: center; padding: 2rem; color: #666;">
+                        Nenhuma sobra disponível para venda no momento.
+                    </td>
+                </tr>
+
+                <tr th:each="item, stat : *{itens}">
+                    <input type="hidden" th:field="*{itens[__${stat.index}__].materialId}" />
+                    <input type="hidden" th:field="*{itens[__${stat.index}__].descricao}" />
+                    <input type="hidden" th:field="*{itens[__${stat.index}__].sobra}" />
+                    <input type="hidden" th:field="*{itens[__${stat.index}__].unidade}" />
+
+                    <td th:text="${item.descricao}">Cimento Votoran</td>
+                    <td classs="col-calculado col-sobra" style="font-size: 1.1em;"
+                        th:text="${#numbers.formatDecimal(item.sobra, 1, 2)} + ' ' + ${item.unidade}">
+                        140.00 KG
+                    </td>
+
+                    <td style="background-color: #eef6fc;">
+                        <div class="form-group" style="margin: 0;">
+                            <input type="number" step="0.01" min="0" placeholder="0,00"
+                                   th:field="*{itens[__${stat.index}__].precoVenda}"
+                                   class="form-control" style="width: 100%; font-weight: bold; color: #0056b3;">
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div style="margin-top: 2rem; text-align: right;">
+                <button type="submit" class="btn" style="font-size: 1.1rem; padding: 0.8rem 2rem;">
+                    Publicar Post de Venda &rarr;
+                </button>
+            </div>
+        </section>
+
+    </form>
+
+</main>
+
+</body>
+</html>

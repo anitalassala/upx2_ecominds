@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora - Posts de Sobras Disponíveis</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="app-layout">
+
+<header th:replace="~{fragments/navbar :: navbar}"></header>
+
+<main class="container-app">
+
+    <div class="page-header">
+        <h1>Posts de Sobras Disponíveis</h1>
+        <p>Veja os pacotes de materiais disponíveis para venda.</p>
+    </div>
+
+    <div th:if="${#lists.isEmpty(posts)}" class="alert alert-success"
+         style="background-color: #e6f7ff; color: #0056b3; text-align: center;">
+        Nenhum post de sobra disponível no momento.
+    </div>
+
+    <div th:each="post : ${posts}">
+        <section class="card">
+            <h2 th:text="${post.titulo}">Sobra de Materiais - Predio 1</h2>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
+                <div>
+                    <strong>Vendedor:</strong>
+                    <span th:text="${post.proprietario.nomeCompleto}">Cassiano</span>
+                </div>
+                <div>
+                    <strong>Postado em:</strong>
+                    <span th:text="${#temporals.format(post.dataCriacao, 'dd/MM/yyyy')}">09/11/2025</span>
+                </div>
+            </div>
+
+            <h3>Itens Inclusos no Post:</h3>
+            <table class="materiais-table">
+                <thead>
+                <tr>
+                    <th>Material</th>
+                    <th>Quantidade</th>
+                    <th class="col-calculado col-sobra">Valor (R$)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${post.itens}">
+                    <td th:text="${item.descricao}">Cimento</td>
+                    <td th:text="${#numbers.formatDecimal(item.quantidade, 1, 2)} + ' ' + ${item.unidade.name()}">
+                        140.00 KG
+                    </td>
+                    <td class="col-calculado col-sobra"
+                        th:text="'R$ ' + ${#numbers.formatDecimal(item.preco, 1, 2)}">
+                        R$ 70,00
+                    </td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr style="background-color: #f9f9f9; font-weight: bold;">
+                    <td colspan="2" style="text-align: right;">Valor Total do Pacote:</td>
+                    <td class="col-calculado col-sobra" style="font-size: 1.2rem;">
+                                <span th:text="'R$ ' + ${#numbers.formatDecimal(#aggregates.sum(post.itens.![preco]), 1, 2)}">
+                                    R$ Total
+                                </span>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </section>
+    </div>
+
+</main>
+
+</body>
+</html>
